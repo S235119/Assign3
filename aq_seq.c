@@ -6,29 +6,62 @@
  */
 
 #include "aq.h"
+#include <stdlib.h>
+
 typedef struct AlarmQueue1 {
     char MsgKind;
-    void *msg;
+    void *meseg;
     struct AlarmQueue* next;
 } AlarmQueue1;
 
 AlarmQueue aq_create( ) {
-    AlarmQueue1 *aq = NULL;
+    AlarmQueue1 *aq = (AlarmQueue1*)malloc(sizeof (AlarmQueue1));
     return (AlarmQueue) aq ;
 }
 
 int aq_send( AlarmQueue aq, void * msg, MsgKind k){
-    return AQ_NOT_IMPL;
+    if(k == AQ_ALARM && aq_alarms(aq)!= 0){
+        return AQ_NO_ROOM;
+    } else{
+        AlarmQueue1 *newNode = (AlarmQueue1*)malloc(sizeof (AlarmQueue1));
+        AlarmQueue1 *head = aq;
+        newNode -> meseg = msg;
+        newNode -> MsgKind = k;
+        newNode -> next = NULL;
+
+        while (head != NULL) {
+            if(head -> next == NULL){
+                head -> next = newNode;
+                break;
+            }
+            head = head -> next;
+        }
+        return 0;
+    }
+
 }
 
 int aq_recv( AlarmQueue aq, void * * msg) {
     if (aq_size(aq) != 0) {
-        if (aq_alarms(aq) != 0) {
-            return AQ_NO_MSG;
+        return AQ_NO_MSG;
+    } else{
+        AlarmQueue1 *head = aq;
+        AlarmQueue1 *curent = NULL;
+
+        char type;
+        while (head != NULL) {
+            if (head->meseg == msg) {
+                type = head -> MsgKind;
+            }
+            head = head->next;
         }
-        return AQ_NO_ROOM;
+
+        head = aq;
+        curent = head -> next;
+        free(head);
+        head = curent;
+        return type;
     }
-    return 1;
 }
 
 int aq_size( AlarmQueue aq) {
