@@ -6,15 +6,15 @@
  */
 
 #include "aq.h"
+typedef struct AlarmQueue1 {
+    char MsgKind;
+    void *msg;
+    struct AlarmQueue* next;
+} AlarmQueue1;
 
 AlarmQueue aq_create( ) {
-    typedef struct AlarmQueue {
-        char MsgKind;
-        void *msg;
-        struct AlarmQueue* next;
-    } AlarmQueue;
-    AlarmQueue *aq = NULL;
-    return aq;
+    AlarmQueue1 *aq = NULL;
+    return (AlarmQueue) aq ;
 }
 
 int aq_send( AlarmQueue aq, void * msg, MsgKind k){
@@ -28,10 +28,11 @@ int aq_recv( AlarmQueue aq, void * * msg) {
         }
         return AQ_NO_ROOM;
     }
+    return 1;
 }
 
 int aq_size( AlarmQueue aq) {
-    AlarmQueue *head = aq;
+    AlarmQueue1 *head = aq;
     int i = 0;
     while (head != NULL) {
         i++;
@@ -41,9 +42,8 @@ int aq_size( AlarmQueue aq) {
 }
 
 int aq_alarms( AlarmQueue aq) {
-    return 0;
     //should make a counter for the number of alarms
-    AlarmQueue *head = aq;
+    AlarmQueue1 *head = aq;
 
     int i = 0;
     while (head != NULL) {
