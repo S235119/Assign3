@@ -1,12 +1,20 @@
+/**
+ * @file   aq.c
+ * @Author 02335 team
+ * @date   October, 2024
+ * @brief  Alarm queue skeleton implementation
+ */
+
 #include "aq.h"
 
 AlarmQueue aq_create( ) {
     typedef struct AlarmQueue {
         char MsgKind;
-        void msg;
+        void *msg;
         struct AlarmQueue* next;
     } AlarmQueue;
-    return AlarmQueue;
+    AlarmQueue *aq = NULL;
+    return aq;
 }
 
 int aq_send( AlarmQueue aq, void * msg, MsgKind k){
@@ -16,9 +24,9 @@ int aq_send( AlarmQueue aq, void * msg, MsgKind k){
 int aq_recv( AlarmQueue aq, void * * msg) {
     if (aq_size(aq) != 0) {
         if (aq_alarms(aq) != 0) {
-            return AQ_NO_MSG
+            return AQ_NO_MSG;
         }
-        return AQ_NO_ROOM
+        return AQ_NO_ROOM;
     }
 }
 
@@ -26,11 +34,10 @@ int aq_size( AlarmQueue aq) {
     AlarmQueue *head = aq;
     int i = 0;
     while (head != NULL) {
-        i++
-        point = head -> next;
-        head = point;
+        i++;
+        head = head -> next;
     }
-    return i
+    return i;
 }
 
 int aq_alarms( AlarmQueue aq) {
@@ -41,9 +48,9 @@ int aq_alarms( AlarmQueue aq) {
     int i = 0;
     while (head != NULL) {
         if(head -> MsgKind == AQ_ALARM){
-            i++
+            i++;
         }
         head = head -> next;
     }
-    return i
+    return i;
 }
