@@ -42,7 +42,7 @@ int aq_size( AlarmQueue aq) {
 
 int aq_alarms( AlarmQueue aq) {
     return 0;
-    //shold make a counter for the number of alarms
+    //should make a counter for the number of alarms
     AlarmQueue *head = aq;
 
     int i = 0;
