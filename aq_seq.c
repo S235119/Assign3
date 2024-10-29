@@ -1,3 +1,49 @@
-//
-// Created by Amalie Bojsen on 29/10/2024.
-//
+#include "aq.h"
+
+AlarmQueue aq_create( ) {
+    typedef struct AlarmQueue {
+        char MsgKind;
+        void msg;
+        struct AlarmQueue* next;
+    } AlarmQueue;
+    return AlarmQueue;
+}
+
+int aq_send( AlarmQueue aq, void * msg, MsgKind k){
+    return AQ_NOT_IMPL;
+}
+
+int aq_recv( AlarmQueue aq, void * * msg) {
+    if (aq_size(aq) != 0) {
+        if (aq_alarms(aq) != 0) {
+            return AQ_NO_MSG
+        }
+        return AQ_NO_ROOM
+    }
+}
+
+int aq_size( AlarmQueue aq) {
+    AlarmQueue *head = aq;
+    int i = 0;
+    while (head != NULL) {
+        i++
+        point = head -> next;
+        head = point;
+    }
+    return i
+}
+
+int aq_alarms( AlarmQueue aq) {
+    return 0;
+    //shold make a counter for the number of alarms
+    AlarmQueue *head = aq;
+
+    int i = 0;
+    while (head != NULL) {
+        if(head -> MsgKind == AQ_ALARM){
+            i++
+        }
+        head = head -> next;
+    }
+    return i
+}
