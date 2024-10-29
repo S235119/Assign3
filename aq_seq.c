@@ -7,6 +7,7 @@
 
 #include "aq.h"
 #include <stdlib.h>
+#include "stdio.h"
 
 typedef struct AlarmQueue1 {
     char MsgKind;
@@ -20,26 +21,31 @@ AlarmQueue aq_create( ) {
 }
 
 int aq_send( AlarmQueue aq, void * msg, MsgKind k){
-    if(k == AQ_ALARM && aq_alarms(aq)!= 0){
+    if (k == AQ_ALARM && aq_alarms(aq) != 0) {
         return AQ_NO_ROOM;
-    } else{
-        AlarmQueue1 *newNode = (AlarmQueue1*)malloc(sizeof (AlarmQueue1));
-        AlarmQueue1 *head = aq;
-        newNode -> meseg = msg;
-        newNode -> MsgKind = k;
-        newNode -> next = NULL;
-
-        while (head != NULL) {
-            if(head -> next == NULL){
-                head -> next = newNode;
-                break;
+    }
+    else{
+        AlarmQueue1 *newNode = (AlarmQueue1*)malloc(sizeof(AlarmQueue1));
+        newNode->meseg = msg;
+        newNode->MsgKind = k;
+        newNode->next = NULL;
+        /*
+        if (k == AQ_ALARM) {
+            // Insert alarm message at the head
+            newNode->next = (AlarmQueue1 *) aq;
+            aq = (AlarmQueue)newNode;  // Update the head of the queue locally
+        } else {*/
+            // Insert normal message at the end of the queue
+            AlarmQueue1 *head = (AlarmQueue1 *) aq;
+            while (head->next != NULL) {
+                head = head->next;
             }
-            head = head -> next;
-        }
+            head->next = newNode;
+        //}
         return 0;
     }
-
 }
+
 
 int aq_recv( AlarmQueue aq, void * * msg) {
     if (aq_size(aq) != 0) {
@@ -64,14 +70,20 @@ int aq_recv( AlarmQueue aq, void * * msg) {
     }
 }
 
-int aq_size( AlarmQueue aq) {
-    AlarmQueue1 *head = aq;
-    int i = 0;
+int aq_size(AlarmQueue aq) {
+    AlarmQueue1* head = aq;
+    int count = 0; // Count of total messages
+
+    printf("Counting messages in the queue...\n"); // Debug print
+
     while (head != NULL) {
-        i++;
-        head = head -> next;
+        count++; // Increment for each message
+        printf("Message %d: Type = %d\n", count, head->MsgKind); // Debug print to show type of message
+        head = head->next; // Move to the next node
     }
-    return i;
+
+    printf("Total messages in the queue: %d\n", count); // Final count
+    return count; // Return total count of messages
 }
 
 int aq_alarms( AlarmQueue aq) {
