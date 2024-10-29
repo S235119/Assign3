@@ -17,11 +17,12 @@ typedef struct AlarmQueue1 {
 
 AlarmQueue aq_create( ) {
     AlarmQueue1 *aq = (AlarmQueue1*)malloc(sizeof (AlarmQueue1));
+    aq -> MsgKind = -1;
     return (AlarmQueue) aq ;
 }
 
 int aq_send( AlarmQueue aq, void * msg, MsgKind k){
-    if (k == AQ_ALARM && aq_alarms(aq) != 0) {
+    if (k == AQ_ALARM && aq_alarms(aq) > 0) {
         return AQ_NO_ROOM;
     }
     else{
@@ -29,14 +30,13 @@ int aq_send( AlarmQueue aq, void * msg, MsgKind k){
         newNode->meseg = msg;
         newNode->MsgKind = k;
         newNode->next = NULL;
-        /*
-        if (k == AQ_ALARM) {
+        AlarmQueue1 *head = (AlarmQueue1 *) aq;
+        /*if (k == AQ_ALARM) {
             // Insert alarm message at the head
-            newNode->next = (AlarmQueue1 *) aq;
-            aq = (AlarmQueue)newNode;  // Update the head of the queue locally
+            newNode->next = head -> next;
+            head -> next = newNode;
         } else {*/
             // Insert normal message at the end of the queue
-            AlarmQueue1 *head = (AlarmQueue1 *) aq;
             while (head->next != NULL) {
                 head = head->next;
             }
@@ -51,30 +51,28 @@ int aq_recv( AlarmQueue aq, void * * msg) {
     if (aq_size(aq) != 0) {
         return AQ_NO_MSG;
     } else{
-        AlarmQueue1 *head = aq;
-        AlarmQueue1 *curent = NULL;
+        AlarmQueue1 *head = (AlarmQueue1*)aq;
+        AlarmQueue1 *trueHead = head -> next;
+        *msg = trueHead -> meseg;
+        int msgType = trueHead->MsgKind;
 
-        char type;
-        while (head != NULL) {
-            if (head->meseg == msg) {
-                type = head -> MsgKind;
-            }
-            head = head->next;
-        }
+        // Update queue head and free old head node
+        AlarmQueue1 *newHead = trueHead->next;
+        free(trueHead);
+        head -> next = newHead;
 
-        head = aq;
-        curent = head -> next;
-        free(head);
-        head = curent;
-        return type;
+        return msgType;
     }
 }
 
 int aq_size(AlarmQueue aq) {
     AlarmQueue1* head = aq;
-    int count = 0; // Count of total messages
+    int count = 0;
 
     printf("Counting messages in the queue...\n"); // Debug print
+
+    //Skiping placeholder note
+    head = head -> next;
 
     while (head != NULL) {
         count++; // Increment for each message
