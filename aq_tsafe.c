@@ -30,6 +30,7 @@ int aq_send( AlarmQueue aq, void * msg, MsgKind k){
     AlarmQueue1 *head = (AlarmQueue1 *) aq;
     pthread_mutex_lock(&head -> mutex);
     if (k == AQ_ALARM && aq_alarms(aq) > 0) {
+        pthread_mutex_unlock(&head->mutex);
         return AQ_NO_ROOM;
     }
     else{
@@ -58,8 +59,13 @@ int aq_send( AlarmQueue aq, void * msg, MsgKind k){
 int aq_recv( AlarmQueue aq, void * * msg) {
     AlarmQueue1 *head = (AlarmQueue1*)aq;
     pthread_mutex_lock(&head -> mutex);
-    pthread_cond_wait(&head -> cond, &head -> mutex);
+
+    while (head -> next == NULL) {
+        pthread_cond_wait(&head -> cond, &head -> mutex);
+    }
+
     if (head == NULL || head -> next == NULL) {
+        pthread_mutex_unlock(&head->mutex);
         return AQ_NO_MSG;
     }
 
@@ -82,15 +88,11 @@ int aq_size(AlarmQueue aq) {
 
     head = head -> next;
 
-    printf("Counting messages in the queue...\n"); // Debug print
-
     while (head != NULL) {
         count++; // Increment for each message
-        printf("Message %d: Type = %d\n", count, head->MsgKind); // Debug print to show type of message
         head = head->next; // Move to the next node
     }
 
-    printf("Total messages in the queue: %d\n", count); // Final count
     pthread_mutex_unlock(&head -> mutex);
     return count; // Return total count of messages
 }
