@@ -13,7 +13,7 @@
 typedef struct AlarmQueue1 {
     char MsgKind;
     void *meseg;
-    struct AlarmQueue* next;
+    struct AlarmQueue1* next;
     pthread_mutex_t mutex;
     pthread_cond_t cond;
 } AlarmQueue1;

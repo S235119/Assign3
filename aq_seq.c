@@ -12,7 +12,7 @@
 typedef struct AlarmQueue1 {
     char MsgKind;
     void *meseg;
-    struct AlarmQueue* next;
+    struct AlarmQueue1* next;
 } AlarmQueue1;
 
 AlarmQueue aq_create( ) {
