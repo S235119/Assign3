@@ -48,21 +48,17 @@ int aq_send( AlarmQueue aq, void * msg, MsgKind k){
 
 
 int aq_recv( AlarmQueue aq, void * * msg) {
-    if (aq_size(aq) != 0) {
+    AlarmQueue1 *head = (AlarmQueue1*)aq;
+    if (head == NULL && head -> next == NULL) {
         return AQ_NO_MSG;
-    } else{
-        AlarmQueue1 *head = (AlarmQueue1*)aq;
-        AlarmQueue1 *trueHead = head -> next;
-        *msg = trueHead -> meseg;
-        int msgType = trueHead->MsgKind;
-
-        // Update queue head and free old head node
-        AlarmQueue1 *newHead = trueHead->next;
-        free(trueHead);
-        head -> next = newHead;
-
-        return msgType;
     }
+    AlarmQueue1 *trueHead = head->next;
+
+
+    *msg = trueHead->meseg;
+    int msgType = trueHead->MsgKind;
+
+    return msgType;
 }
 
 int aq_size(AlarmQueue aq) {
