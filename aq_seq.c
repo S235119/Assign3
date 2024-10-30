@@ -22,13 +22,8 @@ AlarmQueue aq_create( ) {
 }
 
 int aq_send( AlarmQueue aq, void * msg, MsgKind k){
-    AlarmQueue1 *head = (AlarmQueue1 *) aq;
     if (k == AQ_ALARM && aq_alarms(aq) > 0) {
         return AQ_NO_ROOM;
-    } else if(head -> meseg == NULL){
-        head -> MsgKind = k;
-        head -> meseg = msg;
-        head -> next = NULL;
     }
     else{
         AlarmQueue1 *newNode = (AlarmQueue1*)malloc(sizeof(AlarmQueue1));
@@ -36,17 +31,17 @@ int aq_send( AlarmQueue aq, void * msg, MsgKind k){
         newNode->MsgKind = k;
         newNode->next = NULL;
         AlarmQueue1 *head = (AlarmQueue1 *) aq;
-        /*if (k == AQ_ALARM) {
+        if (k == AQ_ALARM) {
             // Insert alarm message at the head
             newNode->next = head -> next;
             head -> next = newNode;
-        } else {*/
+        } else {
             // Insert normal message at the end of the queue
             while (head->next != NULL) {
                 head = head->next;
             }
             head->next = newNode;
-        //}
+        }
     }
     return 0;
 }
@@ -57,21 +52,24 @@ int aq_recv( AlarmQueue aq, void * * msg) {
     if (head == NULL || head -> next == NULL) {
         return AQ_NO_MSG;
     }
-    AlarmQueue1 *trueHead = head->next;
 
+    AlarmQueue1 *nodeToRemove = head->next;
+    *msg = nodeToRemove->meseg;
+    int msgType = nodeToRemove->MsgKind;
 
-    *msg = trueHead->meseg;
-    int msgType = trueHead->MsgKind;
-
-    head->next = trueHead->next;
-    free(trueHead);
+    // Remove the node from the queue
+    head->next = nodeToRemove->next;
+    free(nodeToRemove);
 
     return msgType;
+
 }
 
 int aq_size(AlarmQueue aq) {
     AlarmQueue1* head = aq;
     int count = 0;
+
+    head = head -> next;
 
     printf("Counting messages in the queue...\n"); // Debug print
 
