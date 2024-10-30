@@ -50,6 +50,7 @@ int aq_send( AlarmQueue aq, void * msg, MsgKind k){
         }
     }
     pthread_mutex_unlock(&head -> mutex);
+    pthread_cond_signal(&head -> cond);
     return 0;
 }
 
@@ -57,6 +58,7 @@ int aq_send( AlarmQueue aq, void * msg, MsgKind k){
 int aq_recv( AlarmQueue aq, void * * msg) {
     AlarmQueue1 *head = (AlarmQueue1*)aq;
     pthread_mutex_lock(&head -> mutex);
+    pthread_cond_wait(&head -> cond, &head -> mutex);
     if (head == NULL || head -> next == NULL) {
         return AQ_NO_MSG;
     }
