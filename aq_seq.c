@@ -22,8 +22,13 @@ AlarmQueue aq_create( ) {
 }
 
 int aq_send( AlarmQueue aq, void * msg, MsgKind k){
+    AlarmQueue1 *head = (AlarmQueue1 *) aq;
     if (k == AQ_ALARM && aq_alarms(aq) > 0) {
         return AQ_NO_ROOM;
+    } else if(head -> meseg == NULL){
+        head -> MsgKind = k;
+        head -> meseg = msg;
+        head -> next = NULL;
     }
     else{
         AlarmQueue1 *newNode = (AlarmQueue1*)malloc(sizeof(AlarmQueue1));
@@ -42,14 +47,14 @@ int aq_send( AlarmQueue aq, void * msg, MsgKind k){
             }
             head->next = newNode;
         //}
-        return 0;
     }
+    return 0;
 }
 
 
 int aq_recv( AlarmQueue aq, void * * msg) {
     AlarmQueue1 *head = (AlarmQueue1*)aq;
-    if (head == NULL && head -> next == NULL) {
+    if (head == NULL || head -> next == NULL) {
         return AQ_NO_MSG;
     }
     AlarmQueue1 *trueHead = head->next;
@@ -57,6 +62,9 @@ int aq_recv( AlarmQueue aq, void * * msg) {
 
     *msg = trueHead->meseg;
     int msgType = trueHead->MsgKind;
+
+    head->next = trueHead->next;
+    free(trueHead);
 
     return msgType;
 }
@@ -66,9 +74,6 @@ int aq_size(AlarmQueue aq) {
     int count = 0;
 
     printf("Counting messages in the queue...\n"); // Debug print
-
-    //Skiping placeholder note
-    head = head -> next;
 
     while (head != NULL) {
         count++; // Increment for each message
