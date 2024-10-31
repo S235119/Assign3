@@ -83,7 +83,6 @@ int aq_recv( AlarmQueue aq, void * * msg) {
 
 int aq_size(AlarmQueue aq) {
     AlarmQueue1* head = aq;
-    pthread_mutex_lock(&head -> mutex);
     int count = 0;
 
     head = head -> next;
@@ -93,14 +92,12 @@ int aq_size(AlarmQueue aq) {
         head = head->next; // Move to the next node
     }
 
-    pthread_mutex_unlock(&head -> mutex);
     return count; // Return total count of messages
 }
 
 int aq_alarms( AlarmQueue aq) {
     //should make a counter for the number of alarms
     AlarmQueue1 *head = aq;
-    pthread_mutex_lock(&head -> mutex);
 
     int i = 0;
     while (head != NULL) {
@@ -109,6 +106,5 @@ int aq_alarms( AlarmQueue aq) {
         }
         head = head -> next;
     }
-    pthread_mutex_unlock(&head -> mutex);
     return i;
 }
