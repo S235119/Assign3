@@ -36,19 +36,33 @@ void *consumer(void *arg) {
     return NULL;
 }
 
+// Normal message sender to check ordering
+void *producer_normal(void *arg) {
+    // Wait for the other threads to handle alarms, then send a normal message
+    msleep(300);
+
+    // Send a normal message to the queue
+    put_normal(q, 3);
+    printf("Normal message sent after alarms\n");
+    return NULL;
+}
+
 // Main function to create threads and manage the queue
 int main() {
     // Create the alarm queue before starting the threads
     q = aq_create();
 
-    // Create two threads: one for the producer to send alarm messages and one for the consumer to receive them
-    pthread_t t1, t2;
+    // Create three threads: two for sending alarm messages, one for sending a normal message
+    pthread_t t1, t2, t3;
     pthread_create(&t1, NULL, producer_alarm, NULL);
     pthread_create(&t2, NULL, consumer, NULL);
+    pthread_create(&t3, NULL, producer_normal, NULL);
 
-    // Wait for both threads to complete
+    // Wait for all threads to complete
     pthread_join(t1, NULL);
     pthread_join(t2, NULL);
+    pthread_join(t3, NULL);
 
     return 0;
 }
+
