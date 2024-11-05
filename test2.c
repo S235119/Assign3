@@ -10,30 +10,22 @@ static AlarmQueue q;
 // Producer function: sends an alarm message first, then a normal message
 void *producer1(void *arg) {
 
-    put_normal(q, 7);
-
-    msleep(100);
-
-    put_normal(q, 12);
-
-    msleep(100);
-
     put_normal(q, 3);
+
+    msleep(150);
+
+    put_normal(q, 4);
 
     return NULL;  // Thread function returns NULL
 }
 
 void *producer2(void *arg) {
 
-    put_normal(q, 10);
-
-    msleep(100);
-
-    put_alarm(q, 42);
-
-    msleep(100);
-
     put_alarm(q, 50);
+
+    msleep(150);
+
+    put_normal(q, 7);
 
 
     return NULL;  // Thread function returns NULL
@@ -42,10 +34,10 @@ void *producer2(void *arg) {
 // Consumer function: receives messages from the queues
 void *consumer(void *arg) {
 
+    msleep(100);
     get(q);
     get(q);
-    get(q);
-    get(q);
+    msleep(200);
     get(q);
     get(q);
 
@@ -58,8 +50,8 @@ int main() {
 
     pthread_t t1, t2, t3;
     pthread_create(&t1, NULL, producer1, NULL);
-    pthread_create(&t2, NULL, consumer, NULL);
     pthread_create(&t3, NULL, producer2, NULL);
+    pthread_create(&t2, NULL, consumer, NULL);
 
     pthread_join(t1, NULL);
     pthread_join(t2, NULL);

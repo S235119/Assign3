@@ -29,6 +29,9 @@ AlarmQueue aq_create( ) {
 int aq_send( AlarmQueue aq, void * msg, MsgKind k){
     AlarmQueue1 *head = (AlarmQueue1 *) aq;
     pthread_mutex_lock(&head -> mutex);
+    while (k == AQ_ALARM && aq_alarms(aq) > 0) {
+        pthread_cond_wait(&head -> cond, &head -> mutex);
+    }
     if (k == AQ_ALARM && aq_alarms(aq) > 0) {
         pthread_mutex_unlock(&head->mutex);
         return AQ_NO_ROOM;
@@ -76,6 +79,7 @@ int aq_recv( AlarmQueue aq, void * * msg) {
     // Remove the node from the queue
     head->next = nodeToRemove->next;
     free(nodeToRemove);
+    pthread_cond_signal(&head -> cond);
 
     pthread_mutex_unlock(&head -> mutex);
     return msgType;

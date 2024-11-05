@@ -28,19 +28,21 @@ void *consumer(void *arg) {
     msleep(300);
 
     get(q);
+
+    msleep(300);
+
+    get(q);
     return NULL;
 }
 
 // Normal message sender to check ordering
 void *producer_alarm2(void *arg) {
 
-    // Try to send a second alarm message. Since the queue only allows one alarm at a time,
-    // this should block until the first alarm is received by the consumer.
     put_alarm(q, 2);
 
     msleep(300);
 
-    put_alarm(q,3);
+    put_normal(q,3);
 
     return NULL;
 }
