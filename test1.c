@@ -12,13 +12,6 @@ void *producer_alarm(void *arg) {
     // Send the first alarm message. This should succeed right away since the queue is empty.
     put_alarm(q, 1);
 
-    // Wait 200 milliseconds to give the consumer time to pick up the first alarm.
-    // This sleep helps us create the situation where the next alarm will be blocked if the first one isn’t removed.
-    msleep(200);
-
-    // Try to send a second alarm message. Since the queue only allows one alarm at a time,
-    // this should block until the first alarm is received by the consumer.
-    put_alarm(q, 2);
     return NULL;
 }
 
@@ -31,16 +24,24 @@ void *consumer(void *arg) {
     // Get and remove the first alarm message from the queue.
     // This should unblock the producer, allowing it to send a second alarm.
     get(q);
+
+    msleep(300);
+
+    get(q);
     return NULL;
 }
 
 // Normal message sender to check ordering
-void *producer_normal(void *arg) {
-    // Wait for the other threads to handle alarms, then send a normal message
+void *producer_alarm2(void *arg) {
+
+    // Try to send a second alarm message. Since the queue only allows one alarm at a time,
+    // this should block until the first alarm is received by the consumer.
+    put_alarm(q, 2);
+
     msleep(300);
 
-    // Send a normal message to the queue
-    put_normal(q, 3);
+    put_alarm(q,3);
+
     return NULL;
 }
 
@@ -52,8 +53,8 @@ int main() {
     // Create three threads: two for sending alarm messages, one for sending a normal message
     pthread_t t1, t2, t3;
     pthread_create(&t1, NULL, producer_alarm, NULL);
+    pthread_create(&t3, NULL, producer_alarm2, NULL);
     pthread_create(&t2, NULL, consumer, NULL);
-    pthread_create(&t3, NULL, producer_normal, NULL);
 
     // Wait for all threads to complete
     pthread_join(t1, NULL);
