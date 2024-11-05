@@ -60,7 +60,7 @@ int aq_recv( AlarmQueue aq, void * * msg) {
     AlarmQueue1 *head = (AlarmQueue1*)aq;
     pthread_mutex_lock(&head -> mutex);
 
-    while (head -> next == NULL) {
+    while (aq_size(aq) == 0) {
         pthread_cond_wait(&head -> cond, &head -> mutex);
     }
 
