@@ -12,7 +12,6 @@ void *producer(void *arg) {
     // Add an alarm message with the value 42 to the queue
     // This alarm message should take priority when being received
     put_alarm(q, 42);
-    printf("Sent ALARM message with value 42\n");
 
     // Introduce a small delay (100 ms) to simulate the natural flow of events
     // This delay helps ensure the consumer has time to receive the alarm message first
@@ -21,7 +20,6 @@ void *producer(void *arg) {
     // Now send a normal message with the value 7 to the queue
     // This message will be received after the alarm, assuming the alarm was picked up first
     put_normal(q, 7);
-    printf("Sent normal message with value 7\n");
 
     return NULL;  // Thread function returns NULL
 }
@@ -33,12 +31,10 @@ void *consumer(void *arg) {
     // Receive the first message from the queue
     // Since alarm messages have priority, this should be the alarm message (value 42)
     received = get(q);
-    printf("Received message with value: %d\n", received);
 
     // Receive the next message from the queue
     // This should be the normal message (value 7) if the queue's priority works as expected
     received = get(q);
-    printf("Received message with value: %d\n", received);
 
     return NULL;  // Thread function returns NULL
 }

@@ -19,7 +19,6 @@ void *producer_alarm(void *arg) {
     // Try to send a second alarm message. Since the queue only allows one alarm at a time,
     // this should block until the first alarm is received by the consumer.
     put_alarm(q, 2);
-    printf("Second alarm sent after unblock\n");  // Print after the second alarm is successfully sent.
     return NULL;
 }
 
@@ -31,8 +30,7 @@ void *consumer(void *arg) {
 
     // Get and remove the first alarm message from the queue.
     // This should unblock the producer, allowing it to send a second alarm.
-    int received = get(q);
-    printf("Received alarm with value: %d\n", received);
+    get(q);
     return NULL;
 }
 
@@ -43,7 +41,6 @@ void *producer_normal(void *arg) {
 
     // Send a normal message to the queue
     put_normal(q, 3);
-    printf("Normal message sent after alarms\n");
     return NULL;
 }
 
