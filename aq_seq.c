@@ -22,29 +22,32 @@ AlarmQueue aq_create( ) {
 }
 
 int aq_send( AlarmQueue aq, void * msg, MsgKind k){
+    AlarmQueue1 *head = (AlarmQueue1 *)aq;
+
     if (k == AQ_ALARM && aq_alarms(aq) > 0) {
         return AQ_NO_ROOM;
     }
-    else{
-        AlarmQueue1 *newNode = (AlarmQueue1*)malloc(sizeof(AlarmQueue1));
-        newNode->meseg = msg;
-        newNode->MsgKind = k;
-        newNode->next = NULL;
-        AlarmQueue1 *head = (AlarmQueue1 *) aq;
-        if (k == AQ_ALARM) {
-            // Insert alarm message at the head
-            newNode->next = head -> next;
-            head -> next = newNode;
-        } else {
-            // Insert normal message at the end of the queue
-            while (head->next != NULL) {
-                head = head->next;
-            }
-            head->next = newNode;
+
+    AlarmQueue1 *newNode = (AlarmQueue1 *)malloc(sizeof(AlarmQueue1));
+    newNode->meseg = msg;
+    newNode->MsgKind = k;
+    newNode->next = NULL;
+
+    if (k == AQ_ALARM) {
+        newNode->next = head->next;
+        head->next = newNode;
+    } else {
+        AlarmQueue1 *current = head;
+        while (current->next != NULL) {
+            current = current->next;
         }
+        current->next = newNode;
     }
+
     return 0;
+
 }
+
 
 
 int aq_recv( AlarmQueue aq, void * * msg) {

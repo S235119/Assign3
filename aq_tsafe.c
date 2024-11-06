@@ -28,39 +28,33 @@ AlarmQueue aq_create( ) {
 
 int aq_send(AlarmQueue aq, void *msg, MsgKind k) {
     AlarmQueue1 *head = (AlarmQueue1 *)aq;
-    pthread_mutex_lock(&head->mutex);  // Lås mutex på den oprindelige head
+    pthread_mutex_lock(&head->mutex);
 
-    // Hvis beskeden er en alarm, vent indtil køen har plads til alarmen
     while (k == AQ_ALARM && aq_alarms(aq) > 0) {
         pthread_cond_wait(&head->cond, &head->mutex);
     }
 
-    // Tjek én gang til, om vi kan indsætte alarmen (ellers returnér AQ_NO_ROOM)
     if (k == AQ_ALARM && aq_alarms(aq) > 0) {
         pthread_mutex_unlock(&head->mutex);
         return AQ_NO_ROOM;
     }
 
-    // Opret en ny node for beskeden
     AlarmQueue1 *newNode = (AlarmQueue1 *)malloc(sizeof(AlarmQueue1));
     newNode->meseg = msg;
     newNode->MsgKind = k;
     newNode->next = NULL;
 
     if (k == AQ_ALARM) {
-        // Indsæt alarmbeskeden først i køen, direkte efter `head`
         newNode->next = head->next;
         head->next = newNode;
     } else {
-        // Indsæt normal besked sidst i køen
-        AlarmQueue1 *current = head;  // Brug en midlertidig pointer til at gennemløbe køen
+        AlarmQueue1 *current = head;
         while (current->next != NULL) {
             current = current->next;
         }
         current->next = newNode;
     }
 
-    // Signalér, at der er en ny besked i køen
     pthread_mutex_unlock(&head->mutex);
     pthread_cond_signal(&head->cond);
 
