@@ -98,11 +98,11 @@ int aq_size(AlarmQueue aq) {
     head = head -> next;
 
     while (head != NULL) {
-        count++; // Increment for each message
-        head = head->next; // Move to the next node
+        count++;
+        head = head->next;
     }
 
-    return count; // Return total count of messages
+    return count;
 }
 
 int aq_alarms( AlarmQueue aq) {

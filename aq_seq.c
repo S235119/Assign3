@@ -74,16 +74,11 @@ int aq_size(AlarmQueue aq) {
 
     head = head -> next;
 
-    printf("Counting messages in the queue...\n"); // Debug print
-
     while (head != NULL) {
-        count++; // Increment for each message
-        printf("Message %d: Type = %d\n", count, head->MsgKind); // Debug print to show type of message
-        head = head->next; // Move to the next node
+        count++;
+        head = head->next;
     }
-
-    printf("Total messages in the queue: %d\n", count); // Final count
-    return count; // Return total count of messages
+    return count;
 }
 
 int aq_alarms( AlarmQueue aq) {
