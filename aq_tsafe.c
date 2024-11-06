@@ -106,15 +106,15 @@ int aq_size(AlarmQueue aq) {
 }
 
 int aq_alarms( AlarmQueue aq) {
-    //should make a counter for the number of alarms
     AlarmQueue1 *head = aq;
 
-    int i = 0;
-    while (head != NULL) {
-        if(head -> MsgKind == AQ_ALARM){
-            i++;
-        }
-        head = head -> next;
+    head = head -> next;
+    //Since there can only be one alarm in the queue, we just check if the header is an alarm
+    //In case head -> next is NULL we return 0, so that the program will run
+    if (head  == NULL) {
+        return 0;
     }
-    return i;
+    if(head -> MsgKind == AQ_ALARM){
+        return 1;
+    } else return 0;
 }

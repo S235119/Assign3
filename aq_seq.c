@@ -90,7 +90,11 @@ int aq_alarms( AlarmQueue aq) {
     AlarmQueue1 *head = aq;
 
     head = head -> next;
-    //
+    //Since there can only be one alarm in the queue, we just check if the header is an alarm
+    //In case head -> next is NULL we return 0, so that the program will run
+    if (head  == NULL) {
+        return 0;
+    }
     if(head -> MsgKind == AQ_ALARM){
         return 1;
     } else return 0;
